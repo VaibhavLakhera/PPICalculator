@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">PPI Calculator</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="screen_size_edittext">Screen Size (in inches)</string>
+    <string name="screen_height_edittext">Screen Height (in pixels)</string>
+    <string name="screen_width_edittext">Screen Width (in pixels)</string>
+    <string name="calculate_button">Calculate</string>
+    <string name="auto_detect_button">Auto Detect</string>
+    <string name="clear_button">Clear</string>
+    <string name="settings_label">Settings</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="dark_theme_checkbox">Dark Theme</string>
+    <string name="accurate_checkbox">Accurate</string>
+    <string name="preset_settings">Presets</string>
+</resources>
