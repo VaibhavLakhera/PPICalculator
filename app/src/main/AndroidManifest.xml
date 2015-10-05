@@ -22,11 +22,6 @@
             android:name=".MyPreferenceActivity"
             android:label="Settings"/>
 
-        <activity
-            android:name=".PresetActivity"
-            android:label="Presets"
-            android:theme="@style/Theme.AppCompat.Dialog"/>
-
     </application>
 
 </manifest>

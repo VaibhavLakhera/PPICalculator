@@ -1,6 +1,8 @@
 package com.vaibhavlakhera.ppicalc;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -29,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 	private Boolean accurateResult;
 
 	private int screenHeight = 0, screenWidth = 0;
+
 	private static final String TAG = "MainActivity";
 
 	@Override
@@ -45,6 +48,68 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 		accurateResult = sharedPreferences.getBoolean("accurateCheckBox", false);
+	}
+
+	private void initializeViews()
+	{
+		screenSizeEditText = (EditText) findViewById(R.id.screenSize);
+		screenHeightEditText = (EditText) findViewById(R.id.screenHeight);
+		screenWidthEditText = (EditText) findViewById(R.id.screenWidth);
+		calculatePpiButton = (Button) findViewById(R.id.calculatePpi);
+		autoDetectButton = (Button) findViewById(R.id.autoDetect);
+		clearButton = (Button) findViewById(R.id.clear);
+		displayPpiTextView = (TextView) findViewById(R.id.displayPpi);
+	}
+
+	@Override
+	public void onClick(View v)
+	{
+		InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		mgr.hideSoftInputFromWindow(screenWidthEditText.getWindowToken(), 0);            //To hide the keyboard after pressing the button.
+		switch (v.getId())
+		{
+			case R.id.calculatePpi:
+				calculatePpi();
+				break;
+
+			case R.id.autoDetect:
+				setScreenDimensions();
+				displayPpiTextView.setText("");
+				break;
+
+			case R.id.clear:
+				clearValues();
+				break;
+
+			default:
+				break;
+		}
+	}
+
+	private void calculatePpi()
+	{
+		try
+		{
+			double screenSize = Double.parseDouble(screenSizeEditText.getText().toString());
+			screenHeight = Integer.parseInt(screenHeightEditText.getText().toString());
+			screenWidth = Integer.parseInt(screenWidthEditText.getText().toString());
+
+			if (accurateResult)
+			{
+				double screenPpi = (Math.sqrt((screenHeight * screenHeight) + (screenWidth * screenWidth)) / screenSize);
+				displayPpiTextView.setText(String.format("%.4f", screenPpi) + " PPI");
+			}
+			else
+			{
+				int screenPpi = (int) (Math.sqrt((screenHeight * screenHeight) + (screenWidth * screenWidth)) / screenSize);
+				displayPpiTextView.setText(Integer.toString(screenPpi) + " PPI");
+			}
+		}
+		catch (Exception e)
+		{
+			displayPpiTextView.setText("Invalid screen size");
+			Log.i(TAG, "Exception in calculatePpi() " + e.toString());
+		}
 	}
 
 	private void setScreenDimensions()
@@ -80,20 +145,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 				Log.i(TAG, e.toString());
 			}
 		}
-
 		screenHeightEditText.setText(String.valueOf(screenHeight));
 		screenWidthEditText.setText(String.valueOf(screenWidth));
-	}
-
-	private void initializeViews()
-	{
-		screenSizeEditText = (EditText) findViewById(R.id.screenSize);
-		screenHeightEditText = (EditText) findViewById(R.id.screenHeight);
-		screenWidthEditText = (EditText) findViewById(R.id.screenWidth);
-		calculatePpiButton = (Button) findViewById(R.id.calculatePpi);
-		autoDetectButton = (Button) findViewById(R.id.autoDetect);
-		clearButton = (Button) findViewById(R.id.clear);
-		displayPpiTextView = (TextView) findViewById(R.id.displayPpi);
 	}
 
 	@Override
@@ -109,70 +162,96 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 		switch (item.getItemId())
 		{
 			case R.id.action_settings:
-			{
 				Intent intent = new Intent(this, MyPreferenceActivity.class);
 				startActivity(intent);
 				break;
-			}
 
 			case R.id.preset_settings:
-			{
-				Intent intent = new Intent(this, PresetActivity.class);
-				startActivity(intent);
+				buildPresetDialog();
 				break;
-			}
 		}
 		return super.onOptionsItemSelected(item);
 	}
 
-	@Override
-	public void onClick(View v)
+	private void buildPresetDialog()
 	{
-		InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-		mgr.hideSoftInputFromWindow(screenWidthEditText.getWindowToken(), 0);            //To hide the keyboard after pressing the button.
-		switch (v.getId())
+		final String[] resolutionPresets = { "360p", "360p Wide", "480p VGA", "480p DVD NTSC", "576p DVD PAL", "720p HD", "768p FWXGA", "900p HD+", "1080p FHD", "1200p WUXGA", "1440p WQHD", "1600p WQXGA", "2160p 4K UHD", "4320p 8K UHD" };
+		AlertDialog.Builder dialogBuilder;
+		dialogBuilder = new AlertDialog.Builder(this);
+		dialogBuilder.setTitle("Choose from presets:");
+		dialogBuilder.setItems(resolutionPresets, new DialogInterface.OnClickListener()
 		{
-			case R.id.calculatePpi:
-				calculatePpi();
-				break;
-
-			case R.id.autoDetect:
-				setScreenDimensions();
-				break;
-
-			case R.id.clear:
-				clearValues();
-				break;
-
-			default:
-				break;
-		}
-	}
-
-	private void calculatePpi()
-	{
-		try
-		{
-			double screenSize = Double.parseDouble(screenSizeEditText.getText().toString());
-			screenHeight = Integer.parseInt(screenHeightEditText.getText().toString());
-			screenWidth = Integer.parseInt(screenWidthEditText.getText().toString());
-
-			if (accurateResult)
+			@Override
+			public void onClick(DialogInterface dialog, int which)
 			{
-				double screenPpi = (Math.sqrt((screenHeight * screenHeight) + (screenWidth * screenWidth)) / screenSize);
-				displayPpiTextView.setText(String.format("%.4f", screenPpi) + " PPI");
+				switch (which)
+				{
+					case 0:
+						screenWidthEditText.setText("480");
+						screenHeightEditText.setText("360");
+						break;
+					case 1:
+						screenWidthEditText.setText("640");
+						screenHeightEditText.setText("360");
+						break;
+					case 2:
+						screenWidthEditText.setText("640");
+						screenHeightEditText.setText("480");
+						break;
+					case 3:
+						screenWidthEditText.setText("720");
+						screenHeightEditText.setText("480");
+						break;
+					case 4:
+						screenWidthEditText.setText("720");
+						screenHeightEditText.setText("576");
+						break;
+					case 5:
+						screenWidthEditText.setText("1280");
+						screenHeightEditText.setText("720");
+						break;
+					case 6:
+						screenWidthEditText.setText("1280");
+						screenHeightEditText.setText("768");
+						break;
+					case 7:
+						screenWidthEditText.setText("1600");
+						screenHeightEditText.setText("900");
+						break;
+					case 8:
+						screenWidthEditText.setText("1920");
+						screenHeightEditText.setText("1080");
+						break;
+					case 9:
+						screenWidthEditText.setText("1920");
+						screenHeightEditText.setText("1200");
+						break;
+					case 10:
+						screenWidthEditText.setText("2560");
+						screenHeightEditText.setText("1440");
+						break;
+					case 11:
+						screenWidthEditText.setText("2560");
+						screenHeightEditText.setText("1600");
+						break;
+					case 12:
+						screenWidthEditText.setText("3840");
+						screenHeightEditText.setText("2160");
+						break;
+					case 13:
+						screenWidthEditText.setText("7680");
+						screenHeightEditText.setText("4320");
+						break;
+					default:
+						screenWidthEditText.setText("");
+						screenHeightEditText.setText("");
+						break;
+				}
 			}
-			else
-			{
-				int screenPpi = (int) (Math.sqrt((screenHeight * screenHeight) + (screenWidth * screenWidth)) / screenSize);
-				displayPpiTextView.setText(Integer.toString(screenPpi) + " PPI");
-			}
-		}
-		catch (Exception e)
-		{
-			Log.i(TAG, "Exception in calculatePpi()");
-		}
-
+		});
+		AlertDialog dialogPresets = dialogBuilder.create();
+		dialogPresets.show();
+		displayPpiTextView.setText("");
 	}
 
 	private void clearValues()

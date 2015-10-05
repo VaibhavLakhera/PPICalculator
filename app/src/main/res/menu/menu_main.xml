@@ -4,14 +4,14 @@
       tools:context=".MainActivity">
 
     <item
+        android:id="@+id/preset_settings"
+        android:orderInCategory="100"
+        android:title="@string/preset_settings"
+        app:showAsAction="never"/>
+    <item
         android:id="@+id/action_settings"
         android:orderInCategory="101"
         android:title="@string/action_settings"
         app:showAsAction="never"/>
 
-    <item
-        android:id="@+id/preset_settings"
-        android:orderInCategory="100"
-        android:title="@string/preset_settings"
-        app:showAsAction="never"/>
 </menu>
