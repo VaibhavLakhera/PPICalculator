@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 	private EditText screenSizeEditText, screenHeightEditText, screenWidthEditText;
 	private Button calculatePpiButton, autoDetectButton, clearButton;
 	private TextView displayPpiTextView;
-	private Boolean accurateResult;
+	private Boolean accurateResult, darkTheme;
 
 	private int screenHeight = 0, screenWidth = 0;
 
@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
 		initializeViews();
 
 		calculatePpiButton.setOnClickListener(this);
@@ -48,6 +47,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 		accurateResult = sharedPreferences.getBoolean("accurateCheckBox", false);
+		darkTheme = sharedPreferences.getBoolean("darkThemeCheckBox", false);
+
+		/*if (darkTheme)
+			setTheme(R.style.MaterialDarkTheme);
+		else
+			setTheme(R.style.MaterialLightTheme);*/
 	}
 
 	private void initializeViews()
@@ -64,8 +69,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 	@Override
 	public void onClick(View v)
 	{
+		//Hide the keyboard on button press.
+
 		InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-		mgr.hideSoftInputFromWindow(screenWidthEditText.getWindowToken(), 0);            //To hide the keyboard after pressing the button.
+		mgr.hideSoftInputFromWindow(screenWidthEditText.getWindowToken(), 0);
+
 		switch (v.getId())
 		{
 			case R.id.calculatePpi:
@@ -88,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 	private void calculatePpi()
 	{
+		displayPpiTextView.setText("");
 		try
 		{
 			double screenSize = Double.parseDouble(screenSizeEditText.getText().toString());
@@ -107,7 +116,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 		}
 		catch (Exception e)
 		{
-			displayPpiTextView.setText("Invalid screen size");
 			Log.i(TAG, "Exception in calculatePpi() " + e.toString());
 		}
 	}
@@ -261,5 +269,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 		screenHeightEditText.setText("");
 		screenWidthEditText.setText("");
 		displayPpiTextView.setText("");
+	}
+
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+	}
+
+	@Override
+	protected void onPause()
+	{
+		super.onPause();
 	}
 }
