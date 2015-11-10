@@ -45,9 +45,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 		autoDetectButton.setOnClickListener(this);
 		clearButton.setOnClickListener(this);
 
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-		accurateResult = sharedPreferences.getBoolean("accurateCheckBox", false);
-		darkTheme = sharedPreferences.getBoolean("darkThemeCheckBox", false);
+
 
 		/*if (darkTheme)
 			setTheme(R.style.MaterialDarkTheme);
@@ -275,6 +273,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 	protected void onResume()
 	{
 		super.onResume();
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+		accurateResult = sharedPreferences.getBoolean("accurateCheckBox", false);
+		darkTheme = sharedPreferences.getBoolean("darkThemeCheckBox", false);
 	}
 
 	@Override
