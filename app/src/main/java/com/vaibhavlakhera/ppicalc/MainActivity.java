@@ -5,10 +5,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -25,34 +28,28 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener
 {
 
+	private static final String TAG = "MainActivity";
 	private EditText screenSizeEditText, screenHeightEditText, screenWidthEditText;
 	private Button calculatePpiButton, autoDetectButton, clearButton;
 	private TextView displayPpiTextView;
-	private Boolean accurateResult, darkTheme;
-
+	private Boolean accurateResult;
+	private Toolbar toolbar;
 	private int screenHeight = 0, screenWidth = 0;
-
-	private static final String TAG = "MainActivity";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+		toolbar = (Toolbar) findViewById(R.id.app_bar);
+		setSupportActionBar(toolbar);
+
 		initializeViews();
 
 		calculatePpiButton.setOnClickListener(this);
 		autoDetectButton.setOnClickListener(this);
 		clearButton.setOnClickListener(this);
-
-		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-		accurateResult = sharedPreferences.getBoolean("accurateCheckBox", false);
-		darkTheme = sharedPreferences.getBoolean("darkThemeCheckBox", false);
-
-		/*if (darkTheme)
-			setTheme(R.style.MaterialDarkTheme);
-		else
-			setTheme(R.style.MaterialLightTheme);*/
 	}
 
 	private void initializeViews()
@@ -70,7 +67,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 	public void onClick(View v)
 	{
 		//Hide the keyboard on button press.
-
 		InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 		mgr.hideSoftInputFromWindow(screenWidthEditText.getWindowToken(), 0);
 
@@ -116,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 		}
 		catch (Exception e)
 		{
+			Snackbar.make(displayPpiTextView, "Invalid Value", Snackbar.LENGTH_SHORT).show();
 			Log.i(TAG, "Exception in calculatePpi() " + e.toString());
 		}
 	}
@@ -144,9 +141,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 			Log.i(TAG, "SDK >= 17");
 			try
 			{
-				getWindowManager().getDefaultDisplay().getRealMetrics(metrics);
-				screenHeight = metrics.heightPixels;
-				screenWidth = metrics.widthPixels;
+				Point point = new Point();
+				this.getWindowManager().getDefaultDisplay().getRealSize(point);
+				screenWidth = point.x;
+				screenHeight = point.y;
 			}
 			catch (Exception e)
 			{
@@ -192,6 +190,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 			@Override
 			public void onClick(DialogInterface dialog, int which)
 			{
+				displayPpiTextView.setText("");        //Clears PPI on dialog item selected.
 				switch (which)
 				{
 					case 0:
@@ -259,7 +258,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 		});
 		AlertDialog dialogPresets = dialogBuilder.create();
 		dialogPresets.show();
-		displayPpiTextView.setText("");
 	}
 
 	private void clearValues()
@@ -274,12 +272,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 	@Override
 	protected void onResume()
 	{
+		Log.d(TAG, "onResume()");
 		super.onResume();
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+		accurateResult = sharedPreferences.getBoolean("accurateCheckBox", false);
 	}
 
 	@Override
 	protected void onPause()
 	{
+		Log.d(TAG, "onPause()");
 		super.onPause();
 	}
 }
