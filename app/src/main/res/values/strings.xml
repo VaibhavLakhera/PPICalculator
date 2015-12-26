@@ -12,5 +12,7 @@
 
     <string name="accurate_checkbox">Accurate Result</string>
     <string name="preset_settings">Presets</string>
-
+    <string name="about_settings">About</string>
+    <string name="share_settings">Share Apk</string>
+    <string name="about_dialog_text">PPI Calculator is an open source application with an easy to use interface.\n\nSource code is available at Github:\nwww.github.com/vaibhavlakhera/ppicalculator</string>
 </resources>

@@ -13,5 +13,15 @@
         android:orderInCategory="101"
         android:title="@string/action_settings"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/share_settings"
+        android:orderInCategory="102"
+        android:title="@string/share_settings"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/about_settings"
+        android:orderInCategory="103"
+        android:title="@string/about_settings"
+        app:showAsAction="never"/>
 
 </menu>

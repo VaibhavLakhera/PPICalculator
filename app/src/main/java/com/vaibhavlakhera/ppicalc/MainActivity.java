@@ -5,14 +5,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Point;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
@@ -24,16 +26,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.File;
+
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener
 {
-
 	private static final String TAG = "MainActivity";
 	private EditText screenSizeEditText, screenHeightEditText, screenWidthEditText;
 	private Button calculatePpiButton, autoDetectButton, clearButton;
 	private TextView displayPpiTextView;
 	private Boolean accurateResult;
-	private Toolbar toolbar;
 	private int screenHeight = 0, screenWidth = 0;
 
 	@Override
@@ -42,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		toolbar = (Toolbar) findViewById(R.id.app_bar);
+		Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
 		setSupportActionBar(toolbar);
 
 		initializeViews();
@@ -121,7 +123,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 	{
 		WindowManager windowManager = this.getWindowManager();
 		Display display = windowManager.getDefaultDisplay();
-		DisplayMetrics metrics = new DisplayMetrics();
 
 		if (Build.VERSION.SDK_INT >= 14 && Build.VERSION.SDK_INT < 17)
 		{
@@ -175,8 +176,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 			case R.id.preset_settings:
 				buildPresetDialog();
 				break;
+
+			case R.id.share_settings:
+				displayShareInfo();
+				break;
+
+			case R.id.about_settings:
+				AboutDialogFragment aboutDialogFragment = new AboutDialogFragment();
+				aboutDialogFragment.show(getSupportFragmentManager(), "About Dialog Fragment");
+				break;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	private void displayShareInfo()
+	{
+		try
+		{
+			PackageManager packageManager = getPackageManager();
+			ApplicationInfo applicationInfo = packageManager.getApplicationInfo(getPackageName(), 0);
+			File apkFile = new File(applicationInfo.publicSourceDir);
+			Intent shareIntent = new Intent();
+			shareIntent.setAction(Intent.ACTION_SEND);
+			shareIntent.setType("application/vnd.android.package-archive");
+			shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(apkFile));
+			startActivity(Intent.createChooser(shareIntent, "Share Apk Using"));
+		}
+		catch (PackageManager.NameNotFoundException e)
+		{
+			Log.d(TAG, e.toString());
+		}
 	}
 
 	private void buildPresetDialog()
